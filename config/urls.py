@@ -6,6 +6,7 @@ from django.urls import include, path
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("materials.urls")),  # эндпоинты доступны с префиксом /api/
+    path("api/", include("users.urls")),      # эндпоинты доступны с префиксом /api/
 ]
 
 if settings.DEBUG:
