@@ -1,33 +1,28 @@
-from django.core.management.base import BaseCommand
-from users.models import CustomUser, Payment
-from materials.models import Course, Lesson
-from django.utils import timezone
 import datetime
+
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+
+from materials.models import Course, Lesson
+from users.models import CustomUser, Payment
+
 
 class Command(BaseCommand):
     """
-        Заполняет БД тестовыми платежами и необходимыми связанными объектами
+    Заполняет БД тестовыми платежами и необходимыми связанными объектами
     """
 
     def handle(self, *args, **kwargs):
         # Создаём пользователя
-        user, _ = CustomUser.objects.get_or_create(
-            email='test@example.com',
-            defaults={'password': 'testpass123'}
-        )
+        user, _ = CustomUser.objects.get_or_create(email="test@example.com", defaults={"password": "testpass123"})
         # Создаём курс
         course, _ = Course.objects.get_or_create(
-            title='Тестовый курс',
-            defaults={'description': 'Описание тестового курса'}
+            title="Тестовый курс", defaults={"description": "Описание тестового курса"}
         )
         # Создаём урок
         lesson, _ = Lesson.objects.get_or_create(
-            title='Тестовый урок',
-            defaults={
-                'description': 'Описание урока',
-                'course': course,
-                'link': 'https://example.com/video'
-            }
+            title="Тестовый урок",
+            defaults={"description": "Описание урока", "course": course, "link": "https://example.com/video"},
         )
 
         # Удаляем старые платежи
@@ -40,7 +35,7 @@ class Command(BaseCommand):
             course=course,
             lesson=None,
             amount=5000.00,
-            payment_method='transfer'
+            payment_method="transfer",
         )
         Payment.objects.create(
             user=user,
@@ -48,7 +43,7 @@ class Command(BaseCommand):
             course=None,
             lesson=lesson,
             amount=1500.00,
-            payment_method='cash'
+            payment_method="cash",
         )
         Payment.objects.create(
             user=user,
@@ -56,7 +51,7 @@ class Command(BaseCommand):
             course=course,
             lesson=None,
             amount=5000.00,
-            payment_method='cash'
+            payment_method="cash",
         )
 
-        self.stdout.write(self.style.SUCCESS('Тестовые данные успешно загружены'))
+        self.stdout.write(self.style.SUCCESS("Тестовые данные успешно загружены"))
