@@ -3,12 +3,13 @@ from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from .models import Payment, CustomUser
+from .models import CustomUser, Payment
 from .serializers import PaymentSerializer, UserSerializer, UserUpdateSerializer
 
 
 class UserRegisterView(generics.CreateAPIView):
     """Регистрация пользователя – доступна без авторизации."""
+
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
@@ -16,6 +17,7 @@ class UserRegisterView(generics.CreateAPIView):
 
 class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
     """Профиль – только авторизованному пользователю."""
+
     serializer_class = UserUpdateSerializer
     permission_classes = [IsAuthenticated]
 
@@ -25,6 +27,7 @@ class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
 
 class PaymentListView(generics.ListAPIView):
     """Информация об оплате"""
+
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]

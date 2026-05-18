@@ -1,8 +1,10 @@
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
+
 from .models import Course, Lesson
+from .permissions import IsModerator, IsModeratorOrOwner, IsOwner
 from .serializers import CourseSerializer, LessonSerializer
-from .permissions import IsModerator, IsOwner, IsModeratorOrOwner
+
 
 # CRUD для курса через ViewSet
 class CourseViewSet(viewsets.ModelViewSet):
@@ -10,10 +12,10 @@ class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
 
     def get_permissions(self):
-        if self.action in ['create', 'destroy']:
+        if self.action in ["create", "destroy"]:
             # модераторам запрещено создавать и удалять
             self.permission_classes = [IsAuthenticated, ~IsModerator]
-        elif self.action in ['update', 'partial_update', 'retrieve']:
+        elif self.action in ["update", "partial_update", "retrieve"]:
             self.permission_classes = [IsAuthenticated, IsModeratorOrOwner]
         else:  # list
             self.permission_classes = [IsAuthenticated]
@@ -21,7 +23,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if self.action == 'list' and not user.groups.filter(name='Модераторы').exists():
+        if self.action == "list" and not user.groups.filter(name="Модераторы").exists():
             return Course.objects.filter(owner=user)
         return super().get_queryset()
 
@@ -37,7 +39,7 @@ class LessonListView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        if user.groups.filter(name='Модераторы').exists():
+        if user.groups.filter(name="Модераторы").exists():
             return Lesson.objects.all()
         return Lesson.objects.filter(owner=user)
 
@@ -50,6 +52,7 @@ class LessonCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
 
 # 3. Получение одного урока
 class LessonDetailView(generics.RetrieveAPIView):

@@ -16,9 +16,10 @@ class Course(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='courses',
-        verbose_name='Владелец',
-        null=True, blank=True,
+        related_name="courses",
+        verbose_name="Владелец",
+        null=True,
+        blank=True,
     )
 
     class Meta:
@@ -48,9 +49,10 @@ class Lesson(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='lessons',
-        verbose_name='Владелец',
-        null=True, blank=True,
+        related_name="lessons",
+        verbose_name="Владелец",
+        null=True,
+        blank=True,
     )
 
     class Meta:
