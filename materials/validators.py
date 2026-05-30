@@ -6,7 +6,12 @@ def validate_youtube_link(value):
     """
     Валидатор: разрешает только ссылки на youtube.com
     """
+    # Если значение пустое или None - пропускаем (обработает URLField)
     if not value:
+        return
+
+    # Если value - это не строка (например, dict), пропускаем
+    if not isinstance(value, str):
         return
 
     # Нормализуем ссылку (убираем пробелы)
