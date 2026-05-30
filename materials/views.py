@@ -1,8 +1,9 @@
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiRequest, OpenApiResponse
 
 from .models import Course, Lesson, Subscription
 from .permissions import IsModerator, IsModeratorOrOwner, IsOwner
@@ -89,10 +90,56 @@ class LessonDeleteView(generics.DestroyAPIView):
 
 
 # Эндпоинт для управления подпиской на курс
+@extend_schema(
+    method="post",
+    description="Создать или удалить подписку текущего пользователя на курс.\n"
+                "Если подписки нет — создаётся, если есть — удаляется.",
+    request=OpenApiRequest(
+        {
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "course_id": {
+                        "type": "integer",
+                        "description": "ID курса, на который оформляется подписка",
+                    }
+                },
+                "required": ["course_id"],
+            }
+        }
+    ),
+    responses={
+        200: OpenApiResponse(
+            description="Успешное добавление или удаление подписки",
+            response={
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "example": "Подписка добавлена",
+                    }
+                },
+            },
+        ),
+        400: OpenApiResponse(
+            description="Ошибочный запрос (например, не передан course_id)",
+            response={
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "example": "Не указан course_id",
+                    }
+                },
+            },
+        ),
+        401: OpenApiResponse(description="Неавторизованный пользователь"),
+    },
+)
 class SubscriptionView(APIView):
     """
     Эндпоинт для установки/удаления подписки пользователя на курс.
-    POST: {course_id}: создать подписку или удалить, если уже есть
+    POST: {course_id}: создать подписку или удалить, если уже есть.
     """
     permission_classes = [IsAuthenticated]
 
@@ -103,10 +150,11 @@ class SubscriptionView(APIView):
         if not course_id:
             return Response(
                 {"error": "Не указан course_id"},
-                status=400
+                status=status.HTTP_400_BAD_REQUEST
             )
 
         course_item = get_object_or_404(Course, id=course_id)
+
         subs_item = Subscription.objects.filter(user=user, course=course_item)
 
         if subs_item.exists():
@@ -116,4 +164,4 @@ class SubscriptionView(APIView):
             Subscription.objects.create(user=user, course=course_item)
             message = 'Подписка добавлена'
 
-        return Response({"message": message})
+        return Response({"message": message}, status=status.HTTP_200_OK)
