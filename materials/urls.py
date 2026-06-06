@@ -8,6 +8,7 @@ from .views import (
     LessonDetailView,
     LessonListView,
     LessonUpdateView,
+    SubscriptionView,
 )
 
 app_name = "materials"
@@ -24,4 +25,6 @@ urlpatterns = [
     path("lessons/<int:pk>/delete/", LessonDeleteView.as_view(), name="lesson-delete"),  # DELETE
     # Курсы
     path("", include(router.urls)),
+    # Подписка на курс
+    path("subscribe/", SubscriptionView.as_view(), name="subscription"),
 ]
