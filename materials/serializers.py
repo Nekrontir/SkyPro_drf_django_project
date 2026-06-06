@@ -5,7 +5,6 @@ from .validators import validate_youtube_link
 
 
 class LessonSerializer(serializers.ModelSerializer):
-    # Применяем валидатор только к полю link
     link = serializers.URLField(validators=[validate_youtube_link])
 
     class Meta:
