@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "users",
     "materials",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -156,3 +157,15 @@ SIMPLE_JWT = {
 # Stripe settings
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+
+# Celery Beat настройки
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# Расписание задач celery-beat
+CELERY_BEAT_SCHEDULE = {
+    'block_inactive_users': {
+        'task': 'block_inactive_users',
+        'schedule': timedelta(days=1),
+        'args': (),
+    },
+}
