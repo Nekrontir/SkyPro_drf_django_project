@@ -163,9 +163,20 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 # Расписание задач celery-beat
 CELERY_BEAT_SCHEDULE = {
-    'block_inactive_users': {
-        'task': 'block_inactive_users',
-        'schedule': timedelta(days=1),
-        'args': (),
+    "block_inactive_users_daily": {
+        "task": "materials.tasks.block_inactive_users",
+        "schedule": timedelta(days=1),
     },
 }
+
+
+# Celery / Redis
+CELERY_BROKER_URL = os.getenv(
+    "CELERY_BROKER_URL",
+    f"redis://{os.getenv('REDIS_HOST', 'localhost')}:{os.getenv('REDIS_PORT', '6379')}/{os.getenv('REDIS_DB', '0')}",
+)
+
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = False
