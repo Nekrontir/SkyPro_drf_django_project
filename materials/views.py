@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from drf_spectacular.utils import OpenApiRequest, OpenApiResponse, extend_schema
 from rest_framework import generics, status, viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +12,7 @@ from .models import Course, Lesson, Subscription
 from .paginators import CourseLessonPagination
 from .permissions import IsModeratorOrOwner, IsOwner
 from .serializers import CourseSerializer, LessonSerializer
+from .tasks import send_course_update_email
 
 
 # CRUD для курса через ViewSet
@@ -35,6 +39,13 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def perform_update(self, serializer):
+        course = serializer.save()
+        # Проверяем, когда курс обновлялся последний раз
+        if course.updated_at and timezone.now() - course.updated_at < timedelta(hours=4):
+            return
+        send_course_update_email.delay(course.id)
 
 
 # CRUD для урока через Generic классы
