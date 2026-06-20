@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install --upgrade pip
 
-# Сначала копируем только requirements.txt — это кэшируется
+# Сначала копируем только requirements.txt
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
@@ -22,6 +22,3 @@ COPY . .
 # entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-# collectstatic можно делать при запуске, а не при сборке,
-# чтобы не упираться в отсутствие env/базы на этапе build

@@ -7,7 +7,6 @@ USER="${USER:-postgres}"
 
 echo "Waiting for PostgreSQL at $HOST:$PORT..."
 
-# ждём, пока база станет доступной
 while ! pg_isready -h "$HOST" -p "$PORT" -U "$USER" > /dev/null 2>&1; do
   echo "PostgreSQL is not ready yet, waiting..."
   sleep 2
