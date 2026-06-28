@@ -75,9 +75,9 @@ class PaymentListView(generics.ListAPIView):
 
 @extend_schema(
     description="Создать платеж и получить ссылку на оплату через Stripe.\n"
-                "Необходимо передать course_id (или lesson_id) и amount.\n"
-                "Создаётся продукт и цена в Stripe, затем Checkout Session.\n"
-                "В ответ возвращается URL для оплаты.",
+    "Необходимо передать course_id (или lesson_id) и amount.\n"
+    "Создаётся продукт и цена в Stripe, затем Checkout Session.\n"
+    "В ответ возвращается URL для оплаты.",
     request=OpenApiRequest(
         {
             "application/json": {

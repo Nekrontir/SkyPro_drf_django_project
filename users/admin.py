@@ -10,5 +10,14 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "payment_date", "course", "lesson", "payment_method", "amount", "stripe_product_id", "stripe_payment_status")
-
+    list_display = (
+        "id",
+        "user",
+        "payment_date",
+        "course",
+        "lesson",
+        "payment_method",
+        "amount",
+        "stripe_product_id",
+        "stripe_payment_status",
+    )
