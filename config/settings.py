@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -83,6 +84,13 @@ DATABASES = {
         "PORT": os.getenv("PORT"),
     }
 }
+
+# Использовать SQLite, если запущены тесты или включен режим CI
+if "test" in sys.argv or os.getenv("USE_SQLITE_FOR_CI") == "True":
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": str(BASE_DIR / "db_test.sqlite3"),
+    }
 
 AUTH_USER_MODEL = "users.CustomUser"
 
