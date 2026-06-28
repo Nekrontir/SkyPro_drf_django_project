@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Docker
+docker-compose.override.yml
+
+# Данные файлы в репозитории не нужны
+staticfiles/
