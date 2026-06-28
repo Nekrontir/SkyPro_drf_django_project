@@ -34,6 +34,7 @@ services:
     depends_on:
       - db
       - redis
+    restart: always
 
   celery_worker:
     build: .
@@ -46,6 +47,7 @@ services:
     depends_on:
       - db
       - redis
+    restart: always
 
   celery_beat:
     build: .
@@ -58,6 +60,7 @@ services:
     depends_on:
       - db
       - redis
+    restart: always
 
 volumes:
   postgres_data:
