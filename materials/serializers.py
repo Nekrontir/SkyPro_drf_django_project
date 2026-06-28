@@ -9,8 +9,8 @@ class LessonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lesson
-        fields = '__all__'
-        read_only_fields = ('owner',)
+        fields = "__all__"
+        read_only_fields = ("owner",)
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
@@ -18,7 +18,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription
-        fields = ('id', 'course', 'created_at')
+        fields = ("id", "course", "created_at")
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -28,17 +28,14 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = '__all__'
-        read_only_fields = ('owner',)
+        fields = "__all__"
+        read_only_fields = ("owner",)
 
     def get_lessons_count(self, obj):
         return obj.lessons.count()
 
     def get_is_subscribed(self, obj):
         """Проверяет, подписан ли текущий пользователь на курс"""
-        if self.context.get('request') and self.context['request'].user.is_authenticated:
-            return Subscription.objects.filter(
-                user=self.context['request'].user,
-                course=obj
-            ).exists()
+        if self.context.get("request") and self.context["request"].user.is_authenticated:
+            return Subscription.objects.filter(user=self.context["request"].user, course=obj).exists()
         return False

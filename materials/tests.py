@@ -15,37 +15,27 @@ class TestCourseLessonCRUD(APITestCase):
         self.client = APIClient()
 
         # Создаём пользователей разных групп
-        self.normal_user = User.objects.create_user(
-            email='user@test.com',
-            password='testpass123',
-            first_name='Normal'
-        )
+        self.normal_user = User.objects.create_user(email="user@test.com", password="testpass123", first_name="Normal")
 
-        self.moderator = User.objects.create_user(
-            email='mod@test.com',
-            password='testpass123',
-            first_name='Moderator'
-        )
-        self.moderator.groups.create(name='Модераторы')
+        self.moderator = User.objects.create_user(email="mod@test.com", password="testpass123", first_name="Moderator")
+        self.moderator.groups.create(name="Модераторы")
 
         self.admin = User.objects.create_superuser(
-            email='admin@test.com',
-            password='testpass123',
+            email="admin@test.com",
+            password="testpass123",
         )
 
         # Создаём курс и урок для тестов
         self.course = Course.objects.create(
-            title='Тестовый курс',
-            description='Описание курса',
-            owner=self.normal_user
+            title="Тестовый курс", description="Описание курса", owner=self.normal_user
         )
 
         self.lesson = Lesson.objects.create(
-            title='Тестовый урок',
-            description='Описание урока',
-            link='https://www.youtube.com/watch?v=test',
+            title="Тестовый урок",
+            description="Описание урока",
+            link="https://www.youtube.com/watch?v=test",
             course=self.course,
-            owner=self.normal_user
+            owner=self.normal_user,
         )
 
     # === ТЕСТЫ СОЗДАНИЯ ===
@@ -54,27 +44,23 @@ class TestCourseLessonCRUD(APITestCase):
         """Тест создания урока авторизованным пользователем"""
         self.client.force_authenticate(user=self.normal_user)
 
-        url = '/api/lessons/create/'
+        url = "/api/lessons/create/"
         data = {
-            'title': 'Новый урок',
-            'description': 'Новое описание',
-            'link': 'https://www.youtube.com/watch?v=newvideo',
-            'course': self.course.id
+            "title": "Новый урок",
+            "description": "Новое описание",
+            "link": "https://www.youtube.com/watch?v=newvideo",
+            "course": self.course.id,
         }
 
         response = self.client.post(url, data)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Lesson.objects.filter(title='Новый урок').exists())
+        self.assertTrue(Lesson.objects.filter(title="Новый урок").exists())
 
     def test_create_lesson_unauthenticated(self):
         """Тест создания урока без авторизации"""
-        url = '/api/lessons/create/'
-        data = {
-            'title': 'Новый урок',
-            'link': 'https://www.youtube.com/watch?v=newvideo',
-            'course': self.course.id
-        }
+        url = "/api/lessons/create/"
+        data = {"title": "Новый урок", "link": "https://www.youtube.com/watch?v=newvideo", "course": self.course.id}
 
         response = self.client.post(url, data)
 
@@ -84,11 +70,11 @@ class TestCourseLessonCRUD(APITestCase):
         """Тест создания урока с невалидной ссылкой (не youtube)"""
         self.client.force_authenticate(user=self.normal_user)
 
-        url = '/api/lessons/create/'
+        url = "/api/lessons/create/"
         data = {
-            'title': 'Невалидный урок',
-            'link': 'https://example.com/video',  # не youtube
-            'course': self.course.id
+            "title": "Невалидный урок",
+            "link": "https://example.com/video",  # не youtube
+            "course": self.course.id,
         }
 
         response = self.client.post(url, data)
@@ -101,7 +87,7 @@ class TestCourseLessonCRUD(APITestCase):
         """Тест получения списка уроков"""
         self.client.force_authenticate(user=self.normal_user)
 
-        url = '/api/lessons/'
+        url = "/api/lessons/"
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -110,11 +96,11 @@ class TestCourseLessonCRUD(APITestCase):
         """Тест получения одного урока"""
         self.client.force_authenticate(user=self.normal_user)
 
-        url = f'/api/lessons/{self.lesson.id}/'
+        url = f"/api/lessons/{self.lesson.id}/"
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['title'], self.lesson.title)
+        self.assertEqual(response.data["title"], self.lesson.title)
 
     # === ТЕСТЫ ОБНОВЛЕНИЯ (используем PATCH) ===
 
@@ -122,21 +108,21 @@ class TestCourseLessonCRUD(APITestCase):
         """Тест обновления урока владельцем"""
         self.client.force_authenticate(user=self.normal_user)
 
-        url = f'/api/lessons/{self.lesson.id}/update/'
-        data = {'title': 'Обновлённый урок'}
+        url = f"/api/lessons/{self.lesson.id}/update/"
+        data = {"title": "Обновлённый урок"}
 
         response = self.client.patch(url, data)  # PATCH вместо PUT
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.lesson.refresh_from_db()
-        self.assertEqual(self.lesson.title, 'Обновлённый урок')
+        self.assertEqual(self.lesson.title, "Обновлённый урок")
 
     def test_update_lesson_moderator(self):
         """Тест обновления урока модератором"""
         self.client.force_authenticate(user=self.moderator)
 
-        url = f'/api/lessons/{self.lesson.id}/update/'
-        data = {'title': 'Обновлённый модератором'}
+        url = f"/api/lessons/{self.lesson.id}/update/"
+        data = {"title": "Обновлённый модератором"}
 
         response = self.client.patch(url, data)  # PATCH вместо PUT
 
@@ -148,7 +134,7 @@ class TestCourseLessonCRUD(APITestCase):
         """Тест удаления урока владельцем"""
         self.client.force_authenticate(user=self.normal_user)
 
-        url = f'/api/lessons/{self.lesson.id}/delete/'
+        url = f"/api/lessons/{self.lesson.id}/delete/"
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -158,16 +144,16 @@ class TestCourseLessonCRUD(APITestCase):
         """Тест: модератор не может удалять уроки"""
         # Пересоздаём урок для теста
         self.lesson = Lesson.objects.create(
-            title='Тестовый урок 2',
-            description='Описание урока',
-            link='https://www.youtube.com/watch?v=test',
+            title="Тестовый урок 2",
+            description="Описание урока",
+            link="https://www.youtube.com/watch?v=test",
             course=self.course,
-            owner=self.normal_user
+            owner=self.normal_user,
         )
 
         self.client.force_authenticate(user=self.moderator)
 
-        url = f'/api/lessons/{self.lesson.id}/delete/'
+        url = f"/api/lessons/{self.lesson.id}/delete/"
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -178,17 +164,14 @@ class TestCourseLessonCRUD(APITestCase):
         """Тест создания подписки"""
         self.client.force_authenticate(user=self.normal_user)
 
-        url = '/api/subscribe/'
-        data = {'course_id': self.course.id}
+        url = "/api/subscribe/"
+        data = {"course_id": self.course.id}
 
         response = self.client.post(url, data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['message'], 'Подписка добавлена')
-        self.assertTrue(Subscription.objects.filter(
-            user=self.normal_user,
-            course=self.course
-        ).exists())
+        self.assertEqual(response.data["message"], "Подписка добавлена")
+        self.assertTrue(Subscription.objects.filter(user=self.normal_user, course=self.course).exists())
 
     def test_subscription_delete(self):
         """Тест удаления подписки"""
@@ -197,22 +180,19 @@ class TestCourseLessonCRUD(APITestCase):
 
         self.client.force_authenticate(user=self.normal_user)
 
-        url = '/api/subscribe/'
-        data = {'course_id': self.course.id}
+        url = "/api/subscribe/"
+        data = {"course_id": self.course.id}
 
         response = self.client.post(url, data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['message'], 'Подписка удалена')
-        self.assertFalse(Subscription.objects.filter(
-            user=self.normal_user,
-            course=self.course
-        ).exists())
+        self.assertEqual(response.data["message"], "Подписка удалена")
+        self.assertFalse(Subscription.objects.filter(user=self.normal_user, course=self.course).exists())
 
     def test_subscription_unauthenticated(self):
         """Тест подписки без авторизации"""
-        url = '/api/subscribe/'
-        data = {'course_id': self.course.id}
+        url = "/api/subscribe/"
+        data = {"course_id": self.course.id}
 
         response = self.client.post(url, data)
 
@@ -222,7 +202,7 @@ class TestCourseLessonCRUD(APITestCase):
         """Тест подписки без указания course_id"""
         self.client.force_authenticate(user=self.normal_user)
 
-        url = '/api/subscribe/'
+        url = "/api/subscribe/"
         data = {}
 
         response = self.client.post(url, data)
@@ -235,7 +215,7 @@ class TestCourseLessonCRUD(APITestCase):
         """Модератор видит все уроки"""
         self.client.force_authenticate(user=self.moderator)
 
-        url = '/api/lessons/'
+        url = "/api/lessons/"
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

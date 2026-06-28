@@ -67,23 +67,23 @@ class Subscription(models.Model):
     """Подписка пользователя на курс"""
 
     user = models.ForeignKey(
-        'users.CustomUser',
+        "users.CustomUser",
         on_delete=models.CASCADE,
-        related_name='subscriptions',
-        verbose_name='Пользователь',
+        related_name="subscriptions",
+        verbose_name="Пользователь",
     )
     course = models.ForeignKey(
-        'materials.Course',
+        "materials.Course",
         on_delete=models.CASCADE,
-        related_name='subscriptions',
-        verbose_name='Курс',
+        related_name="subscriptions",
+        verbose_name="Курс",
     )
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата подписки')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата подписки")
 
     class Meta:
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
-        unique_together = ['user', 'course']
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
+        unique_together = ["user", "course"]
 
     def __str__(self):
-        return f'{self.user.email} - {self.course.title}'
+        return f"{self.user.email} - {self.course.title}"

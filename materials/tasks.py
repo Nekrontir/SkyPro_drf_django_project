@@ -18,7 +18,7 @@ def send_course_update_email(course_id):
     course = Course.objects.get(id=course_id)
     subscriptions = Subscription.objects.filter(course=course)
 
-    subject = f'Обновление материала курса: {course.title}'
+    subject = f"Обновление материала курса: {course.title}"
     message = f'Курс "{course.title}" был обновлён! Проверьте новые материалы.'
 
     emails = [s.user.email for s in subscriptions if s.user.email]
